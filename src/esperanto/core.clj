@@ -2,6 +2,7 @@
   (:import
    [org.elasticsearch.common.transport InetSocketTransportAddress]
    [org.elasticsearch.action.admin.cluster.health ClusterHealthRequest]
+   [org.elasticsearch.action.admin.indices.delete DeleteIndexRequest]
    [org.elasticsearch.client.action.index IndexRequestBuilder]
    [org.elasticsearch.client.transport TransportClient]
    [org.elasticsearch.common.settings ImmutableSettings]
@@ -36,4 +37,8 @@
       .cluster
       (.health (ClusterHealthRequest. (make-array String 0)))
       .actionGet))
+
+(defn delete-index [client idx]
+  (-> client (.admin) (.indices)
+      (.delete (DeleteIndexRequest. idx)) (.actionGet)))
 
