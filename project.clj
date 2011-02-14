@@ -1,4 +1,4 @@
-(defproject esproto "1.0.0-SNAPSHOT"
+(defproject esperanto "1.0.0-SNAPSHOT"
   :description "You know, for clojure"
   :repositories {"sonatype"
                  "http://oss.sonatype.org/content/repositories/releases/"}

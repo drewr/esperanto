@@ -1,4 +1,4 @@
-(ns esproto.core
+(ns esperanto.core
   (:import
    [org.elasticsearch.common.transport InetSocketTransportAddress]
    [org.elasticsearch.action.admin.cluster.health ClusterHealthRequest]

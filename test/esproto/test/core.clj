@@ -1,5 +1,5 @@
-(ns esproto.test.core
-  (:use [esproto.core] :reload)
+(ns esperanto.test.core
+  (:use [esperanto.core] :reload)
   (:use [clojure.test]))
 
 (deftest replace-me ;; FIXME: write
