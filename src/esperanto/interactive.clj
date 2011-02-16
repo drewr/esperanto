@@ -11,7 +11,8 @@
   (with-out-str
     (println "Type as much of a command as necessary.")
     (let [f "%-20s %-60s"
-          lines [["cluster NAME" "Change to cluster NAME."]]]
+          lines [["cluster NAME" "Change to cluster NAME."]
+                 ["exit" "Leave essh (or ^D)."]]]
       (doseq [line lines]
         (println (apply format f line))))))
 
@@ -35,6 +36,11 @@
       (.trim line)
       line)))
 
+(defn exit [input text]
+  (when (nil? input)
+    (print "\n"))
+  (println text))
+
 (defn shell []
   (let [world {:cluster "elasticsearch"}]
     (prompt (:cluster world))
@@ -48,7 +54,7 @@
             (println (.trim (:out world))))
           (prompt (:cluster world))
           (recur world (readl *in*)))
-        (println "\nGoodbye!")))))
+        (exit input "Goodbye!")))))
 
 (defn -main [& args]
   (println welcome)
