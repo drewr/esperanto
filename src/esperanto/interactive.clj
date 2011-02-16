@@ -9,11 +9,12 @@
   (flush))
 
 (defn help []
-  (println "Type as much of a command as necessary.")
-  (let [f "%-20s %-60s"
-        lines [["cluster NAME" "Change to cluster NAME."]]]
-    (doseq [line lines]
-      (println (apply format f line)))))
+  (with-out-str
+    (println "Type as much of a command as necessary.")
+    (let [f "%-20s %-60s"
+          lines [["cluster NAME" "Change to cluster NAME."]]]
+      (doseq [line lines]
+        (println (apply format f line))))))
 
 (defn tokenize [input]
   (.split input "\\s+"))
