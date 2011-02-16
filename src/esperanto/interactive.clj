@@ -24,7 +24,8 @@
            (if (seq cmd)
              (condp #(.startsWith %1 %2) cmd
                "help" {:out (help)}
-               "cluster" {:out (first opts)}
+               "cluster" {:out ""
+                          :cluster (first opts)}
                {:out (help)})
              {:out ""}))))
 
