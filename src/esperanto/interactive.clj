@@ -16,7 +16,7 @@
       (println (apply format f line)))))
 
 (defn tokenize [input]
-  (.split input "\\s"))
+  (.split input "\\s+"))
 
 (defn evaluate [world input]
   (let [[cmd & opts] (tokenize input)]
