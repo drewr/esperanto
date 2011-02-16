@@ -1,6 +1,5 @@
 (ns esperanto.interactive
-  (:gen-class)
-  (:require [clojure.main]))
+  (:gen-class))
 
 (def welcome "ElasticSearch Shell")
 
