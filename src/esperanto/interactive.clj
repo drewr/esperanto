@@ -21,10 +21,12 @@
 (defn evaluate [world input]
   (let [[cmd & opts] (tokenize input)]
     (merge world
-           (condp #(.startsWith %1 %2) cmd
-             "help" {:out (help)}
-             "cluster" {:out (first opts)}
-             {:out (help)}))))
+           (if (seq cmd)
+             (condp #(.startsWith %1 %2) cmd
+               "help" {:out (help)}
+               "cluster" {:out (first opts)}
+               {:out (help)})
+             {:out ""}))))
 
 (defn readl [rdr]
   (let [line (.readLine rdr)]
@@ -41,7 +43,8 @@
                (nil? input)
                (= input "exit"))
         (let [world (evaluate world input)]
-          (println (:out world))
+          (when (seq (:out world))
+            (println (.trim (:out world))))
           (prompt (:cluster world))
           (recur world (readl *in*)))
         (println "\nGoodbye!")))))
