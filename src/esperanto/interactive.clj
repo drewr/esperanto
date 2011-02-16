@@ -26,18 +26,24 @@
              "cluster" {:out (first opts)}
              {:out (help)}))))
 
+(defn readl [rdr]
+  (let [line (.readLine rdr)]
+    (if (string? line)
+      (.trim line)
+      line)))
+
 (defn shell []
   (let [world {:cluster "elasticsearch"}]
     (prompt (:cluster world))
     (loop [world world
-           input (.trim (.readLine *in*))]
+           input (readl *in*)]
       (if-not (or
                (nil? input)
                (= input "exit"))
         (let [world (evaluate world input)]
           (println (:out world))
           (prompt (:cluster world))
-          (recur world (.readLine *in*)))
+          (recur world (readl *in*)))
         (println "\nGoodbye!")))))
 
 (defn -main [& args]
