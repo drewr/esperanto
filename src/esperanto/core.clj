@@ -27,10 +27,15 @@
     (doto (TransportClient. s)
       (.addTransportAddress (InetSocketTransportAddress. host port)))))
 
-(defn make-index-request [client idx payload]
-  (doto (IndexRequestBuilder. client idx)
-    (.setSource payload)
-    (.setType (payload "type"))))
+(defn make-index-request
+  ([client idx source]
+     (make-index-request client idx (or (source "_type")
+                                        (source "type"))
+                         source))
+  ([client idx type source]
+     (doto (IndexRequestBuilder. client idx)
+       (.setSource source)
+       (.setType type))))
 
 (defn health [client cluster]
   (-> client .admin
