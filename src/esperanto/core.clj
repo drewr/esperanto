@@ -47,3 +47,9 @@
   (-> client (.admin) (.indices)
       (.delete (DeleteIndexRequest. idx)) (.actionGet)))
 
+(defn execute [request & listener]
+  (if listener
+    (reify org.elasticsearch.action.ActionListener
+           (onResponse [_ resp] (listener resp))
+           (onFailure [_ e] (listener e)))
+    (future (-> request .execute .actionGet))))
