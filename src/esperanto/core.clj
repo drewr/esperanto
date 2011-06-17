@@ -1,15 +1,27 @@
 (ns esperanto.core
+  (:require [cheshire :as json])
   (:import
    [org.elasticsearch.common.transport InetSocketTransportAddress]
    [org.elasticsearch.action.admin.cluster.health ClusterHealthRequest]
    [org.elasticsearch.action.admin.indices.delete DeleteIndexRequest]
    [org.elasticsearch.client.action.index IndexRequestBuilder]
+   [org.elasticsearch.client.action.bulk BulkRequestBuilder]
    [org.elasticsearch.client.transport TransportClient]
    [org.elasticsearch.common.settings ImmutableSettings]
    [org.elasticsearch.node NodeBuilder]
-   [org.scribe.builder ServiceBuilder]
-   [org.scribe.builder.api TwitterApi]
-   ))
+   [org.elasticsearch.action.count CountRequest]
+   [org.elasticsearch.index.query.xcontent QueryStringQueryBuilder]))
+
+(defn node-client
+  "Contruct a node-client from a clojure map of settings"
+  [settings]
+  (-> (NodeBuilder/nodeBuilder)
+      (.loadConfigSettings false)
+      (.settings (-> (ImmutableSettings/settingsBuilder)
+                     (.loadFromSource (json/encode settings))
+                     (.put "transport.tcp.compress" true)))
+      (.node)
+      (.client)))
 
 (defn make-node [& {:as settings}]
   (let [s (doto (ImmutableSettings/settingsBuilder)
@@ -34,8 +46,18 @@
                          source))
   ([client idx type source]
      (doto (IndexRequestBuilder. client idx)
-       (.setSource source)
-       (.setType type))))
+       (.setType type)
+       (.setSource source))))
+
+(defn make-bulk-request [client reqs]
+  (loop [br (BulkRequestBuilder. client)
+         r reqs]
+    (if-not (seq reqs)
+      br
+      (do
+        (println "adding" (first reqs))
+        (.add br (first reqs))
+        (recur br (rest reqs))))))
 
 (defn health [client cluster]
   (-> client .admin
@@ -53,3 +75,16 @@
            (onResponse [_ resp] (listener resp))
            (onFailure [_ e] (listener e)))
     (future (-> request .execute .actionGet))))
+
+(defn count-doc
+  ([client index-name]
+     (count-doc client index-name "*:*"))
+  ([client index-name q]
+     (-> client
+         (.count
+          (.query
+           (CountRequest. (into-array String [index-name]))
+           (QueryStringQueryBuilder. q)))
+         .actionGet
+         .count)))
+
