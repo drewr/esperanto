@@ -4,7 +4,8 @@
                  "http://oss.sonatype.org/content/repositories/releases/"}
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
-                 [org.elasticsearch/elasticsearch "0.15.0"]
-                 [org.scribe/scribe "1.0.9"]]
-  :dev-dependencies [[swank-clojure "1.2.1"]]
+                 [org.elasticsearch/elasticsearch "0.16.2"]
+                 [org.scribe/scribe "1.0.9"]
+                 [cheshire "1.1.0"]]
+  :dev-dependencies [[swank-clojure "1.3.1"]]
   :aot [esperanto.interactive])
