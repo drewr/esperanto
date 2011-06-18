@@ -1,5 +1,5 @@
 (ns esperanto.core
-  (:require [cheshire :as json])
+  (:require [cheshire.core :as json])
   (:import
    [org.elasticsearch.common.transport InetSocketTransportAddress]
    [org.elasticsearch.action.admin.cluster.health ClusterHealthRequest]
