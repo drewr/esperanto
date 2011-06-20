@@ -7,16 +7,25 @@
 
 (def *dir* nil)
 
-(use-fixtures :once dir-fixture)
+(use-fixtures :each dir-fixture)
 
 (defn dir-fixture [f]
   (binding [*dir* (-> (File. "tmp")
-                            (File.
-                             (subs (str (java.util.UUID/randomUUID)) 0 8)))]
+                      (File.
+                       (str "lucene-"
+                            (subs
+                             (str
+                              (java.util.UUID/randomUUID)) 0 8))))]
     (.mkdir *dir*)
     (f)
     (.delete *dir*)))
 
-(deftest t-test
+(deftest t-index-document-1
+  (println "****" (str *dir*)))
+
+(deftest t-index-document-2
+  (println "****" (str *dir*)))
+
+(deftest t-index-document-3
   (println "****" (str *dir*)))
 
