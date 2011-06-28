@@ -15,10 +15,9 @@
 (defn make-bulk-request [client reqs]
   (loop [br (BulkRequestBuilder. client)
          r reqs]
-    (if-not (seq reqs)
-      br
+    (if (seq r)
       (do
-        (println "adding" (first reqs))
-        (.add br (first reqs))
-        (recur br (rest reqs))))))
+        (.add br (first r))
+        (recur br (rest r)))
+      br)))
 
