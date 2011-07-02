@@ -1,16 +1,7 @@
 (ns esperanto.client
   (:import (org.elasticsearch.common.settings ImmutableSettings)
            (org.elasticsearch.common.transport InetSocketTransportAddress)
-           (org.elasticsearch.client.transport TransportClient)
-           (org.elasticsearch.node NodeBuilder)))
-
-(defn make-node [& {:as settings}]
-  (let [s (doto (ImmutableSettings/settingsBuilder)
-            (.put (merge settings {"transport.tcp.compress" true})))]
-    (-> (NodeBuilder/nodeBuilder)
-        (.loadConfigSettings false)
-        (.settings s)
-        .build)))
+           (org.elasticsearch.client.transport TransportClient)))
 
 (defn make-client-node [& {:as settings}]
   (apply make-node (-> (merge settings {"node.client" "true"})
