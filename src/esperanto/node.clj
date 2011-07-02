@@ -4,7 +4,7 @@
 
 (defn make-node [& {:as settings}]
   (let [s (doto (ImmutableSettings/settingsBuilder)
-            (.put (merge settings {"transport.tcp.compress" true})))]
+            (.put (merge settings {"transport.tcp.compress" "true"})))]
     (-> (NodeBuilder/nodeBuilder)
         (.loadConfigSettings false)
         (.settings s)
