@@ -10,3 +10,16 @@
         (.settings s)
         .build)))
 
+(defn node-fixture [node]
+  (fn [f]
+    (try
+      (.start node)
+      (f)
+      (finally
+       (.stop node)))))
+
+(defn rand-cluster-name []
+  (str "cluster_"
+       (-> (java.util.UUID/randomUUID) str
+           .toUpperCase (subs 0 8))))
+
