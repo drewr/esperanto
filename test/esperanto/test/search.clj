@@ -1,4 +1,4 @@
-(ns esperanto.test.index
+(ns esperanto.test.search
   (:use [esperanto.index] :reload)
   (:use [clojure.test]
         [esperanto.node]
@@ -28,3 +28,4 @@
         req (make-bulk-request (.client node) reqs)
         res @(execute req)]
     (is (not (.hasFailures res)))))
+
