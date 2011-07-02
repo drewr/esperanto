@@ -14,7 +14,7 @@
   (let [doc {"type" "tweet"
              "id" "1"
              "text" "The quick brown fox jumps over the lazy dog"}
-        res @(execute
-              (make-index-request (.client node) "twitter" doc))]
+        req (make-index-request (.client node) "twitter" doc)
+        res @(execute req)]
     (is (.getId res))))
 
