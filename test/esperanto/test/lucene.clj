@@ -3,11 +3,7 @@
   (:use [clojure.test])
   (:import (java.io File)))
 
-(declare dir-fixture)
-
 (def *dir* nil)
-
-(use-fixtures :each dir-fixture)
 
 (defn dir-fixture [f]
   (binding [*dir* (-> (File. "tmp")
@@ -19,6 +15,8 @@
     (.mkdir *dir*)
     (f)
     (.delete *dir*)))
+
+(use-fixtures :each dir-fixture)
 
 (deftest t-index-document-1
   (println "****" (str *dir*)))
