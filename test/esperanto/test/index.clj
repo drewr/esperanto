@@ -18,3 +18,13 @@
         res @(execute req)]
     (is (.getId res))))
 
+(deftest t-index-bulk
+  (let [doc {"type" "tweet"
+             "text" "The quick brown fox jumps over the lazy dog"}
+        reqs (for [i (range 10)]
+               (make-index-request (.client node)
+                                   "twitter"
+                                   (merge doc {"id" i})))
+        req (make-bulk-request (.client node) reqs)
+        res @(execute req)]
+    (is (not (.hasFailures res)))))
