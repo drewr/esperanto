@@ -16,8 +16,9 @@
          .actionGet
          .count)))
 
-(let [disp #(vec (map type %&))]
-  (defmulti make-search-request disp))
+(def m-s-r-dsp #(vec (map type %&)))
+
+(defmulti make-search-request m-s-r-dsp)
 
 (defmethod make-search-request [NodeClient String String]
   [client idx query]
