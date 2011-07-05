@@ -1,4 +1,5 @@
 (ns esperanto.index
+  (:use [esperanto.action :only [execute]])
   (:import (org.elasticsearch.client.action.bulk BulkRequestBuilder)
            (org.elasticsearch.client.action.index IndexRequestBuilder)))
 
@@ -20,4 +21,7 @@
         (.add br (first r))
         (recur br (rest r)))
       br)))
+
+(defn index-doc [client idx doc]
+  @(execute (make-index-request client idx doc)))
 

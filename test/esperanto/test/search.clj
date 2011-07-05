@@ -16,7 +16,7 @@
 (deftest t-index-single
   (let [doc {"type" "tweet"
              "text" "The quick brown fox jumps over the lazy dog"}
-        resp @(execute (make-index-request (.client node) index doc))
+        _ (index-doc (.client node) index doc)
         _ (refresh (.client node) index)
         sresp @(execute (make-search-request (.client node) index "quick"))]
     (is (= 1 (-> sresp .hits .totalHits)))))
@@ -24,8 +24,8 @@
 (deftest t-index-double
   (let [doc {"type" "tweet"
              "text" "The quick brown fox jumps over the lazy dog"}
-        resp @(execute (make-index-request (.client node) index doc))
-        resp @(execute (make-index-request (.client node) index doc))
+        _ (index-doc (.client node) index doc)
+        _ (index-doc (.client node) index doc)
         _ (refresh (.client node) index)
         sresp @(execute (make-search-request (.client node) index "quick"))]
     (is (= 2 (-> sresp .hits .totalHits)))))
