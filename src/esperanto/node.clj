@@ -10,6 +10,19 @@
         (.settings s)
         .build)))
 
+(defn rand-cluster-name []
+  (str "cluster_"
+       (-> (java.util.UUID/randomUUID) str
+           .toUpperCase (subs 0 8))))
+
+(defn make-test-node [& {:as settings}]
+  (apply make-node (flatten
+                    (merge
+                     {"index.store.type" "ram"
+                      "node.local" "true"
+                      "cluster.name" (rand-cluster-name)}
+                     settings))))
+
 (defn node-fixture [node]
   (fn [f]
     (try
@@ -17,9 +30,4 @@
       (f)
       (finally
        (.stop node)))))
-
-(defn rand-cluster-name []
-  (str "cluster_"
-       (-> (java.util.UUID/randomUUID) str
-           .toUpperCase (subs 0 8))))
 

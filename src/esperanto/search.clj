@@ -1,6 +1,8 @@
 (ns esperanto.search
-  (:import (org.elasticsearch.action.count CountRequest)
-           (org.elasticsearch.index.query.xcontent QueryStringQueryBuilder)))
+  (:import (clojure.lang PersistentVector)
+           (org.elasticsearch.client.node NodeClient)
+           (org.elasticsearch.index.query.xcontent QueryBuilders)
+           (org.elasticsearch.action.count CountRequest)))
 
 (defn count-doc
   ([client index-name]
@@ -10,7 +12,20 @@
          (.count
           (.query
            (CountRequest. (into-array String [index-name]))
-           (QueryStringQueryBuilder. q)))
+           (QueryBuilders/queryString q)))
          .actionGet
          .count)))
+
+(let [disp #(vec (map type %&))]
+  (defmulti make-search-request disp))
+
+(defmethod make-search-request [NodeClient String String]
+  [client idx query]
+  (make-search-request client [idx] query))
+
+(defmethod make-search-request [NodeClient PersistentVector String]
+  [client idxs query]
+  (-> client
+      (.prepareSearch (into-array idxs))
+      (.setQuery (QueryBuilders/queryString query))))
 
