@@ -1,4 +1,5 @@
 (ns esperanto.test.search
+  (:refer-clojure :exclude [doc])
   (:use [esperanto.index]
         [esperanto.search] :reload)
   (:use [clojure.test]
