@@ -33,12 +33,12 @@
 (deftest t-index-bulk
   (let [doc {"type" "tweet"
              "text" "The quick brown fox jumps over the lazy dog"}
-        reqs (for [i (range 10)]
-               (make-index-request (.client node) index
-                                   (merge doc {"id" i})))
-        resp @(execute (make-bulk-request (.client node) reqs))
+        resp (index-bulk (.client node) index (repeat 10 doc))
         _ (refresh (.client node) index)
-        sresp @(execute (make-search-request (.client node) index "quick"))]
+        sresp @(execute (make-search-request (.client node) index "quick"))
+        timeout 100]
+    (is (< (.getTookInMillis resp) timeout)
+        (format "*** bulk index took longer than %dms" timeout))
     (is (not (.hasFailures resp)))
     (is (= 10 (-> sresp .hits .totalHits)))))
 
