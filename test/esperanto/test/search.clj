@@ -20,22 +20,20 @@
 (use-fixtures :each (index-fixture node index))
 
 (deftest t-index-single
-  (let [_ (index-doc client index doc)
-        _ (refresh client index)
-        sresp @(execute (make-search-request client index "quick"))]
-    (is (= 1 (-> sresp .hits .totalHits)))))
+  (index-doc client index doc)
+  (refresh client index)
+  (is (= 1 (-> (search client index "quick") .hits .totalHits))))
 
 (deftest t-index-double
-  (let [_ (index-doc client index doc)
-        _ (index-doc client index doc)
-        _ (refresh client index)
-        sresp @(execute (make-search-request client index "quick"))]
-    (is (= 2 (-> sresp .hits .totalHits)))))
+  (index-doc client index doc)
+  (index-doc client index doc)
+  (refresh client index)
+  (is (= 2 (-> (search client index "quick") .hits .totalHits))))
 
 (deftest t-index-bulk
   (let [resp (index-bulk client index (repeat 10 doc))
         _ (refresh client index)
-        sresp @(execute (make-search-request client index "quick"))
+        sresp (search client index "quick")
         timeout 100]
     (is (< (.getTookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))

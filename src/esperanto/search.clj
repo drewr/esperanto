@@ -24,6 +24,12 @@
       (.prepareCount (into-array idxs))
       (.setQuery (QueryBuilders/queryString query))))
 
+(defn search
+  ([client idx]
+     (search client idx "*:*"))
+  ([client idx query]
+     @(execute (make-search-request client idx query))))
+
 (defn count
   ([client idx]
      (count client idx "*:*"))
