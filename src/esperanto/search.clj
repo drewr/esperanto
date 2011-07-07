@@ -3,7 +3,7 @@
   (:use [esperanto.action :only [execute]])
   (:import (clojure.lang PersistentVector)
            (org.elasticsearch.client.node NodeClient)
-           (org.elasticsearch.index.query.xcontent QueryBuilders)))
+           (org.elasticsearch.index.query QueryBuilders)))
 
 (def make-search-request* #(vec (map type %&)))
 
