@@ -1,5 +1,6 @@
 (ns esperanto.index
   (:use [esperanto.action :only [execute]])
+  (:require [cheshire.core :as json])
   (:import (org.elasticsearch.client.action.bulk BulkRequestBuilder)
            (org.elasticsearch.client.action.index IndexRequestBuilder)
            (org.elasticsearch.client.node NodeClient)))
@@ -12,7 +13,7 @@
   ([client idx type source]
      (doto (IndexRequestBuilder. client idx)
        (.setType type)
-       (.setSource source))))
+       (.setSource (json/generate-string source)))))
 
 (defn make-bulk-request [client reqs]
   (loop [br (BulkRequestBuilder. client)
