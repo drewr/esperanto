@@ -16,6 +16,10 @@
 (def doc {"type" "tweet"
           "text" "The quick brown fox jumps over the lazy dog"})
 
+(defn doc-seq [n]
+  (for [i (range n)]
+    (merge doc {"id" i})))
+
 (use-fixtures :once (node-fixture node))
 (use-fixtures :each (index-fixture node index))
 
@@ -31,14 +35,28 @@
   (is (= 2 (-> (search client index "quick") .hits .totalHits))))
 
 (deftest t-index-bulk
-  (let [resp (index-bulk client index (repeat 10 doc))
+  (let [resp (index-bulk client index (repeat 100 doc))
         _ (refresh client index)
         sresp (search client index "quick")
         timeout 100]
     (is (< (.getTookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))
     (is (not (.hasFailures resp)))
-    (is (= 10 (-> sresp .hits .totalHits)))))
+    (is (= 100 (-> sresp .hits .totalHits)))))
+
+(deftest t-index-seq
+  (let [ct 500
+        bulk (index-bulk client index (doc-seq ct))
+        _ (refresh client index)]
+    (is (not (.hasFailures bulk)))
+    ;; How many docs does ES think the index has?
+    (is (= ct (count client index)))
+    ;; Make sure we're representing the total results of the search
+    (is (= ct (-> (search client index) .hits .totalHits)))
+    ;; Finally, check that the seq has the right numbers
+    (is (= ct (clojure.core/count (index-seq client index))))
+    (is (= (range ct) (sort (map (comp #(get % "id") #(.getSource %))
+                                  (index-seq client index)))))))
 
 (deftest t-count
   (index-doc client index doc)

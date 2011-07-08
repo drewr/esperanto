@@ -30,9 +30,15 @@
   ([client reqs]
      @(execute (make-bulk-request client reqs)))
   ([client idx docs]
-     @(execute
-       (make-bulk-request
-        client
-        (for [doc docs]
-          (make-index-request client idx doc))))))
+     (let [resp @(execute
+                  (make-bulk-request
+                   client
+                   (for [doc docs]
+                     (make-index-request client idx doc))))]
+       resp)))
+
+(defn bulk-failures [response]
+  (->> (.items response)
+       (filter #(.isFailed %))
+       (map #(.getFailureMessage %))))
 
