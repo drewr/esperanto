@@ -34,5 +34,8 @@
   ([client idx]
      (count client idx "*:*"))
   ([client idx query]
-     @(execute (make-count-request client [idx] query))))
+     (-> (make-count-request client [idx] query)
+         execute
+         deref
+         .getCount)))
 

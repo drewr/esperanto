@@ -43,7 +43,7 @@
 (deftest t-count
   (index-doc client index doc)
   (refresh client index)
-  (is (= 1 (.getCount (count client index))))
-  (is (= 1 (.getCount (count client index "quick"))))
-  (is (= 0 (.getCount (count client index "foo")))))
+  (is (= 1 (count client index)))
+  (is (= 1 (count client index "quick")))
+  (is (= 0 (count client index "foo"))))
 
