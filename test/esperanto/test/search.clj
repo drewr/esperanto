@@ -38,7 +38,7 @@
   (let [resp (index-bulk client index (repeat 100 doc))
         _ (refresh client index)
         sresp (search client index "quick")
-        timeout 100]
+        timeout 500]
     (is (< (.getTookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))
     (is (not (.hasFailures resp)))
