@@ -1,5 +1,6 @@
 (ns esperanto.admin.indices
-  (:use [esperanto.action :only [execute]])
+  (:use [esperanto.action :only [execute]]
+        [esperanto.admin.cluster :only [wait-for]])
   (:import (org.elasticsearch.client Requests)
            (org.elasticsearch.indices IndexMissingException)))
 
@@ -40,10 +41,9 @@
 
 (defn index-fixture [node idx]
   (fn [f]
-    (try
-      (create (.client node) idx {"number_of_shards" "1"})
-      (f)
-      (finally
-       (when (status (.client node) idx)
-         (delete (.client node) idx))))))
+    (when (status (.client node) idx)
+      (delete (.client node) idx))
+    (create (.client node) idx {"number_of_shards" "1"})
+    (wait-for :green (.client node) [idx] 10000)
+    (f)))
 
