@@ -1,7 +1,9 @@
 (defproject esperanto "1.0.0-SNAPSHOT"
   :description "You know, for clojure"
   :repositories {"sonatype"
-                 "http://oss.sonatype.org/content/repositories/releases/"}
+                 "http://oss.sonatype.org/content/repositories/releases/"
+                 "java.net"
+                 "http://download.java.net/maven/2/"}
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.elasticsearch/elasticsearch "0.17.0-SNAPSHOT"]
