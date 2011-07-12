@@ -41,9 +41,9 @@
 
 (defn index-fixture [node idx]
   (fn [f]
-    (when (status (.client node) idx)
+    (when-let [istat (status (.client node) idx)]
       (delete (.client node) idx))
-    (create (.client node) idx {"number_of_shards" "1"})
-    (wait-for :green (.client node) [idx] 10000)
+    (create (.client node) idx {"number_of_shards" "1"
+                                "number_of_replicas" "0"})
     (f)))
 
