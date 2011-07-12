@@ -52,7 +52,7 @@
     (is (= 100 (-> sresp .hits .totalHits)))))
 
 (deftest t-index-seq
-  (let [ct 10
+  (let [ct 100
         coll (doc-seq ct)
         ids (into #{} (map #(get % "id") coll))
         bulk (index-bulk client index coll)

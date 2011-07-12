@@ -36,7 +36,8 @@
                   (make-bulk-request
                    client
                    (for [doc docs]
-                     (make-index-request client idx doc))))]
+                     (doto (make-index-request client idx doc)
+                       (-> .request .beforeLocalFork)))))]
        resp)))
 
 (defn bulk-failures [response]
