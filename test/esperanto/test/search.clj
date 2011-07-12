@@ -18,7 +18,14 @@
 
 (defn doc-seq [n]
   (for [i (range n)]
-    (merge doc {"id" i})))
+    (doto (java.util.HashMap.)
+      (.put "id" (str i))
+      (.put "type" "tweet")
+      (.put "text" "The quick brown fox jumps over the lazy dog"))))
+
+(defn doc-seq [n]
+  (for [i (range n)]
+    (merge doc {"id" (str i)})))
 
 (use-fixtures :once (node-fixture node))
 (use-fixtures :each (index-fixture node index))
@@ -45,8 +52,10 @@
     (is (= 100 (-> sresp .hits .totalHits)))))
 
 (deftest t-index-seq
-  (let [ct 500
-        bulk (index-bulk client index (doc-seq ct))
+  (let [ct 10
+        coll (doc-seq ct)
+        ids (into #{} (map #(get % "id") coll))
+        bulk (index-bulk client index coll)
         _ (refresh client index)]
     (is (not (.hasFailures bulk)))
     ;; How many docs does ES think the index has?
@@ -55,8 +64,8 @@
     (is (= ct (-> (search client index) .hits .totalHits)))
     ;; Finally, check that the seq has the right numbers
     (is (= ct (clojure.core/count (index-seq client index))))
-    (is (= (range ct) (sort (map (comp #(get % "id") #(.getSource %))
-                                  (index-seq client index)))))))
+    (is (= ids (into #{} (map #(-> % .id)
+                              (index-seq client index)))))))
 
 (deftest t-count
   (index-doc client index doc)

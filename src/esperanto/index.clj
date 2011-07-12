@@ -8,9 +8,13 @@
                                         (get source "type"))
                          source))
   ([client idx type source]
-     (-> client
-         (.prepareIndex idx type)
-         (.setSource (json/generate-string source)))))
+     (let [req (-> client
+                   (.prepareIndex idx type)
+                   #_(.setSource (json/generate-string source))
+                   (.setSource source))]
+       (if-let [id (get source "id")]
+         (-> req (.setId (str id)))
+         req))))
 
 (defn make-bulk-request [client reqs]
   (loop [br (.prepareBulk client)
