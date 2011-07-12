@@ -4,8 +4,8 @@
 
 (defn make-index-request
   ([client idx source]
-     (make-index-request client idx (or (source "_type")
-                                        (source "type"))
+     (make-index-request client idx (or (get source "_type")
+                                        (get source "type"))
                          source))
   ([client idx type source]
      (-> client
