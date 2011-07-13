@@ -60,9 +60,9 @@
     (is (not (.hasFailures bulk)))
     ;; How many docs does ES think the index has?
     (is (= ct (count client index)))
-    ;; Make sure we're representing the total results of the search
+    ;; How many docs does a search for all docs return?
     (is (= ct (-> (search client index) .hits .totalHits)))
-    ;; Finally, check that the seq has the right numbers
+    ;; Are the ids exactly what we indexed?
     (is (= ct (clojure.core/count (index-seq client index))))
     (is (= ids (into #{} (map #(-> % .id)
                               (index-seq client index)))))))
