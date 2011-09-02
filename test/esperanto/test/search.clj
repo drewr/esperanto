@@ -7,7 +7,7 @@
         [esperanto.admin.indices :only [refresh index-fixture]]
         [esperanto.action :only [execute]]))
 
-(def node (make-test-node))
+(def node (make-test-node {}))
 
 (def client (.client node))
 

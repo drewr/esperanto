@@ -4,8 +4,8 @@
         [esperanto.node :only [node-fixture make-test-node]]
         [esperanto.admin.indices :only [index-fixture]]))
 
-(def node1 (make-test-node "cluster.name" "e.t.a.cluster"))
-(def node2 (make-test-node "cluster.name" "e.t.a.cluster"))
+(def node1 (make-test-node {"cluster.name" "e.t.a.cluster"}))
+(def node2 (make-test-node {"cluster.name" "e.t.a.cluster"}))
 (def client (.client node1))
 
 (def index "foo")

@@ -4,11 +4,11 @@
            (org.elasticsearch.common.transport InetSocketTransportAddress)
            (org.elasticsearch.client.transport TransportClient)))
 
-(defn make-client-node [& {:as settings}]
+(defn make-client-node [settings]
   (apply make-node (-> (merge settings {"node.client" "true"})
                        seq flatten)))
 
-(defn make-transport-client [host port cluster & {:as settings}]
+(defn make-transport-client [{:keys [host port cluster] :as settings}]
   (let [s (doto (ImmutableSettings/settingsBuilder)
             (.put "cluster.name" cluster)
             (.put (or settings {})))]
