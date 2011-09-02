@@ -10,6 +10,9 @@
         (.settings s)
         .build)))
 
+(defn make-client-node [settings]
+  (make-node (merge settings {"node.client" "true"})))
+
 (defn rand-cluster-name []
   (str "cluster_"
        (-> (java.util.UUID/randomUUID) str
