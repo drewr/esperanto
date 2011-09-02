@@ -8,5 +8,5 @@
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.elasticsearch/elasticsearch "0.17.6"]
                  [cheshire "2.0.0"]]
-  :dev-dependencies [[swank-clojure "1.3.1"]]
+  :dev-dependencies [[swank-clojure "1.3.2"]]
   :aot [esperanto.interactive])
