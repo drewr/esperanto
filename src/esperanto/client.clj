@@ -1,4 +1,5 @@
 (ns esperanto.client
+  (:use [esperanto.node :only [make-node]])
   (:import (org.elasticsearch.common.settings ImmutableSettings)
            (org.elasticsearch.common.transport InetSocketTransportAddress)
            (org.elasticsearch.client.transport TransportClient)))
