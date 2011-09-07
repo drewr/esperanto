@@ -22,7 +22,7 @@
 
 (defn make-delete-request [client & indices]
   (-> client .admin .indices
-      (.prepareDelete (into-array String indices))))
+      (.prepareDelete (first indices))))
 
 (defn create
   ([client idx]
