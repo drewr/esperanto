@@ -3,7 +3,7 @@
   (:use [clojure.test])
   (:import (java.io File)))
 
-(def *dir* nil)
+(def ^:dynamic *dir* nil)
 
 (defn dir-fixture [f]
   (binding [*dir* (-> (File. "tmp")
