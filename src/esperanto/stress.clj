@@ -3,6 +3,7 @@
             [clojure.string :as s]
             [esperanto.search :as search])
   (:use [esperanto.index :only [index-bulk]]
+        [esperanto.admin.indices :only [refresh]]
         [esperanto.node :only [make-client-node]]))
 
 (defn take-rand [n xs]
@@ -28,9 +29,12 @@
                  "cluster.name" "foo"})
                .start))
 
-  (dotimes [_ 10]
-    (index-rand (.client foo) "test" words 100 1000)
+  (time
+   (let [c (.client foo)]
+     (dotimes [_ 1000]
+       (index-rand c "test" words 100 100)
+       (refresh c "test"))))
 
-    )
 
-  )
+
+)
