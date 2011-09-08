@@ -25,16 +25,24 @@
   (def foo (-> (make-client-node
                 {"node.name" "Foo!!!"
                  "discovery.zen.ping.multicast.enabled" "false"
-                 "discovery.zen.ping.unicast.hosts" "localhost:9302"
-                 "cluster.name" "foo"})
+                 "discovery.zen.ping.unicast.hosts" "localhost:9300"
+                 "cluster.name" "elasticsearch"})
                .start))
 
   (time
-   (let [c (.client foo)]
-     (dotimes [_ 1000]
-       (index-rand c "test" words 100 100)
-       (refresh c "test"))))
+   (let [c (.client foo)
+         me (System/currentTimeMillis)
+         iter 10
+         bsize 500
+         wsize 500
+         t (atom 0)]
+     (println me "start" iter bsize wsize)
+     (dotimes [_ iter]
+       (index-rand c "test" words bsize wsize)
+       (refresh c "test")
+       (println me (swap! t + batch)))
+     (println me "end" (* iter bsize) @t)))
 
 
 
-)
+  )
