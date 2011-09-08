@@ -5,7 +5,7 @@
            (org.elasticsearch.action.search SearchType)
            (org.elasticsearch.client.node NodeClient)
            (org.elasticsearch.common.unit TimeValue)
-           (org.elasticsearch.index.query.xcontent QueryBuilders)))
+           (org.elasticsearch.index.query QueryBuilders)))
 
 (def make-search-request* #(vec (map type %&)))
 
@@ -45,3 +45,30 @@
          execute
          deref
          .getCount)))
+
+(defn scroll [client id timeout]
+  (lazy-seq
+   (when-let [hits (seq
+                    (-> @(execute (make-scroll-request client id timeout))
+                        .hits))]
+     (cons hits (scroll client id timeout)))))
+
+(defn scan
+  ([client idx query timeout]
+     (scroll client
+             (.scrollId @(execute
+                          (-> (make-search-request client idx query)
+                              (.setSearchType SearchType/SCAN)
+                              (.setSize 50)
+                              (.setScroll
+                               (TimeValue/timeValueMillis timeout)))))
+             timeout)))
+
+(defn index-seq
+  ([client idx]
+     (index-seq client idx "*:*"))
+  ([client idx query]
+     (index-seq client idx query 120000))
+  ([client idx query timeout]
+     (apply concat (scan client idx query timeout))))
+
