@@ -40,7 +40,7 @@
                 {"node.name" "Foo!!!"
                  "discovery.zen.ping.multicast.enabled" "false"
                  "discovery.zen.ping.unicast.hosts" "localhost:9300"
-                 "cluster.name" "elasticsearch"})
+                 "cluster.name" "foo"})
                .start))
 
   (let [c (.client foo)
