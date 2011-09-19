@@ -13,8 +13,8 @@
 
 (def index "twitter")
 
-(def doc {"type" "tweet"
-          "text" "The quick brown fox jumps over the lazy dog"})
+(def doc {:type "tweet"
+          :text "The quick brown fox jumps over the lazy dog"})
 
 (defn doc-seq [n]
   (for [i (range n)]
@@ -25,7 +25,7 @@
 
 (defn doc-seq [n]
   (for [i (range n)]
-    (merge doc {"id" (str i)})))
+    (merge doc {:id (str i)})))
 
 (use-fixtures :once (node-fixture node))
 (use-fixtures :each (index-fixture node index))
@@ -33,13 +33,13 @@
 (deftest t-index-single
   (index-doc client index doc)
   (refresh client index)
-  (is (= 1 (-> (search client index "quick") .hits .totalHits))))
+  (is (= 1 (-> (search client index "quick") meta :total))))
 
 (deftest t-index-double
   (index-doc client index doc)
   (index-doc client index doc)
   (refresh client index)
-  (is (= 2 (-> (search client index "quick") .hits .totalHits))))
+  (is (= 2 (-> (search client index "quick") meta :total))))
 
 (deftest t-index-bulk
   (let [resp (index-bulk client index (repeat 100 doc))
@@ -49,23 +49,22 @@
     (is (< (.getTookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))
     (is (not (.hasFailures resp)))
-    (is (= 100 (-> sresp .hits .totalHits)))))
+    (is (= 100 (-> sresp meta :total)))))
 
 (deftest t-index-seq
   (let [ct 100
         coll (doc-seq ct)
-        ids (into #{} (map #(get % "id") coll))
+        ids (into #{} (map :id coll))
         bulk (index-bulk client index coll)
         _ (refresh client index)]
     (is (not (.hasFailures bulk)))
     ;; How many docs does ES think the index has?
     (is (= ct (count client index)))
     ;; How many docs does a search for all docs return?
-    (is (= ct (-> (search client index) .hits .totalHits)))
+    (is (= ct (-> (search client index) meta :total)))
     ;; Are the ids exactly what we indexed?
     (is (= ct (clojure.core/count (index-seq client index))))
-    (is (= ids (into #{} (map #(-> % .id)
-                              (index-seq client index)))))))
+    (is (= ids (into #{} (map :id (index-seq client index)))))))
 
 (deftest t-count
   (index-doc client index doc)

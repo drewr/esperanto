@@ -4,15 +4,18 @@
 
 (defn make-index-request
   ([client idx source]
-     (make-index-request client idx (or (get source "_type")
+     (make-index-request client idx (or (get source :_type)
+                                        (get source "_type")
+                                        (get source :type)
                                         (get source "type"))
                          source))
   ([client idx type source]
      (let [req (-> client
                    (.prepareIndex idx type)
-                   #_(.setSource (json/generate-string source))
-                   (.setSource source))]
-       (if-let [id (get source "id")]
+                   (.setSource (json/generate-string source))
+                   #_(.setSource source))]
+       (if-let [id (or (get source :id)
+                       (get source "id"))]
          (-> req (.setId (str id)))
          req))))
 
@@ -26,7 +29,8 @@
       br)))
 
 (defn index-doc [client idx doc]
-  @(execute (make-index-request client idx doc)))
+  (merge doc
+         {:id (.getId @(execute (make-index-request client idx doc)))}))
 
 (defn index-bulk
   ([client reqs]

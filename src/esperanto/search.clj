@@ -31,11 +31,31 @@
       (.prepareCount (into-array idxs))
       (.setQuery (QueryBuilders/queryString query))))
 
+(defn hit->clj [hit]
+  (with-meta (merge {:id (.getId hit)}
+                    (cheshire.core/parse-string
+                     (.sourceAsString hit) :kw))
+    {:index (.getIndex hit)
+     :node (-> hit .getShard .getNodeId)
+     :shard (-> hit .getShard .getShardId)
+     :sort-vals (seq (.getSortValues hit))}))
+
+(defn search->clj [r]
+  (with-meta (map hit->clj (.getHits r))
+    {:facets (.getFacets r)
+     :shards (.getTotalShards r)
+     :shards-bad (.getFailedShards r)
+     :shards-good (.getSuccessfulShards r)
+     :status (bean (.status r))
+     :timed-out? (.isTimedOut r)
+     :took (.getTookInMillis r)
+     :total (-> r .getHits .getTotalHits)}))
+
 (defn search
   ([client idx]
      (search client idx "*:*"))
   ([client idx query]
-     @(execute (make-search-request client idx query))))
+     (search->clj @(execute (make-search-request client idx query)))))
 
 (defn count
   ([client idx]
@@ -51,7 +71,7 @@
    (when-let [hits (seq
                     (-> @(execute (make-scroll-request client id timeout))
                         .hits))]
-     (cons hits (scroll client id timeout)))))
+     (cons (map hit->clj hits) (scroll client id timeout)))))
 
 (defn scan
   ([client idx query timeout]
