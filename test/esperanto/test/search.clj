@@ -56,15 +56,17 @@
         coll (doc-seq ct)
         ids (into #{} (map :id coll))
         bulk (index-bulk client index coll)
-        _ (refresh client index)]
+        _ (refresh client index)
+        sresp (search client index)
+        xs (index-seq client index)]
     (is (not (.hasFailures bulk)))
     ;; How many docs does ES think the index has?
     (is (= ct (count client index)))
     ;; How many docs does a search for all docs return?
-    (is (= ct (-> (search client index) meta :total)))
+    (is (= ct (-> sresp meta :total)))
     ;; Are the ids exactly what we indexed?
-    (is (= ct (clojure.core/count (index-seq client index))))
-    (is (= ids (into #{} (map :id (index-seq client index)))))))
+    (is (= ct (clojure.core/count xs)))
+    (is (= ids (into #{} (map :id xs))))))
 
 (deftest t-count
   (index-doc client index doc)
