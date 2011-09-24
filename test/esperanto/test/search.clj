@@ -33,18 +33,18 @@
 (deftest t-index-single
   (index-doc client index doc)
   (refresh client index)
-  (is (= 1 (-> (search client index "quick") meta :total))))
+  (is (= 1 (-> (searchq client index "quick") meta :total))))
 
 (deftest t-index-double
   (index-doc client index doc)
   (index-doc client index doc)
   (refresh client index)
-  (is (= 2 (-> (search client index "quick") meta :total))))
+  (is (= 2 (-> (searchq client index "quick") meta :total))))
 
 (deftest t-index-bulk
   (let [resp (index-bulk client index (repeat 100 doc))
         _ (refresh client index)
-        sresp (search client index "quick")
+        sresp (searchq client index "quick")
         timeout 500]
     (is (< (.getTookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))

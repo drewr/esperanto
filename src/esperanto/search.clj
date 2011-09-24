@@ -2,25 +2,17 @@
   (:refer-clojure :exclude [count])
   (:require [cheshire.core :as json])
   (:use [esperanto.action :only [execute]])
-  (:import (clojure.lang PersistentVector)
-           (org.elasticsearch.action.search SearchType)
+  (:import (org.elasticsearch.action.search SearchType)
            (org.elasticsearch.client.node NodeClient)
            (org.elasticsearch.common.unit TimeValue)
            (org.elasticsearch.index.query QueryBuilders)))
 
-(def make-search-request* #(vec (map type %&)))
-
-(defmulti make-search-request #(apply #'make-search-request* %&))
-
-(defmethod make-search-request [NodeClient String String]
-  [client idx query]
-  (make-search-request client [idx] query))
-
-(defmethod make-search-request [NodeClient PersistentVector String]
-  [client idxs query]
-  (-> client
-      (.prepareSearch (into-array idxs))
-      (.setQuery (QueryBuilders/queryString query))))
+(defn make-search-request [client idxs query]
+  (let [idxs (if (sequential? idxs) idxs (vector idxs))
+        idxs (into-array String idxs)]
+    (-> client
+        (.prepareSearch idxs)
+        (.setQuery (json/generate-string query)))))
 
 (defn make-scroll-request [client id timeout]
   (-> client
@@ -54,9 +46,15 @@
 
 (defn search
   ([client idx]
-     (search client idx "*:*"))
+     (search client idx {:match_all {}}))
   ([client idx query]
-     (search->clj @(execute (make-search-request client idx query)))))
+     (search->clj
+      @(execute (make-search-request client idx query)))))
+
+(defn searchq
+  ([client idx query]
+     (search client idx {:query_string
+                         {:query query}})))
 
 (defn count
   ([client idx]
@@ -87,7 +85,7 @@
 
 (defn index-seq
   ([client idx]
-     (index-seq client idx "*:*"))
+     (index-seq client idx {:match_all {}}))
   ([client idx query]
      (index-seq client idx query 120000))
   ([client idx query timeout]
