@@ -1,13 +1,13 @@
 # esperanto
 
-FIXME: write description
+Clojure library for ElasticSearch.
 
 ## Usage
 
-FIXME: write
+Visit `test/esperanto/test/search.clj` for now.
 
 ## License
 
-Copyright (C) 2010 FIXME
+Copyright (C) 2010-2011 Drew Raines
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under the MIT license.
