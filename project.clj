@@ -7,6 +7,6 @@
   :dependencies [[org.clojure/clojure "1.3.0-beta3"]
                  [org.clojure.contrib/repl-utils "1.3.0-alpha1"]
                  [org.elasticsearch/elasticsearch "0.17.6"]
-                 [cheshire "2.0.0"]]
+                 [cheshire "2.0.2"]]
   :dev-dependencies [[swank-clojure "1.3.2"]]
   :aot [esperanto.interactive])
