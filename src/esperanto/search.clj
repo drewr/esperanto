@@ -1,5 +1,6 @@
 (ns esperanto.search
   (:refer-clojure :exclude [count])
+  (:require [cheshire.core :as json])
   (:use [esperanto.action :only [execute]])
   (:import (clojure.lang PersistentVector)
            (org.elasticsearch.action.search SearchType)
@@ -33,7 +34,7 @@
 
 (defn hit->clj [hit]
   (with-meta (merge {:id (.getId hit)}
-                    (cheshire.core/parse-string
+                    (json/parse-string
                      (.sourceAsString hit) :kw))
     {:index (.getIndex hit)
      :node (-> hit .getShard .getNodeId)

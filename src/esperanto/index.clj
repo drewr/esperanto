@@ -1,5 +1,6 @@
 (ns esperanto.index
-  (:use [esperanto.action :only [execute]])
+  (:use [esperanto.action :only [execute]]
+        [esperanto.search :only [index-seq]])
   (:require [cheshire.core :as json]))
 
 (defn make-index-request
@@ -48,4 +49,10 @@
   (->> (.items response)
        (filter #(.isFailed %))
        (map #(.getFailureMessage %))))
+
+(defn copy [client1 idx1 client2 idx2]
+  (count
+   (apply concat
+          (for [docs (partition-all 5 (index-seq client1 idx1))]
+            (index-bulk client2 idx2 docs)))))
 

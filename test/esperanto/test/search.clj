@@ -68,6 +68,22 @@
     (is (= ct (clojure.core/count xs)))
     (is (= ids (into #{} (map :id xs))))))
 
+(deftest t-index-copy
+  (let [idx1 "foo"
+        idx2 "bar"
+        ct 100
+        coll (doc-seq ct)
+        ids (into #{} (map :id coll))
+        _ (index-bulk client idx1 coll)
+        _ (refresh client idx1)
+        ct2 (copy client idx1 client idx2)
+        _ (refresh client idx2)]
+    (is (= (clojure.core/count coll)
+           (clojure.core/count (index-seq client idx1))
+           ct2
+           (clojure.core/count (index-seq client idx2))))
+    (is (= ids (into #{} (map :id (index-seq client idx2)))))))
+
 (deftest t-count
   (index-doc client index doc)
   (refresh client index)
