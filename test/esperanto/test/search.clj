@@ -4,8 +4,7 @@
         [esperanto.search] :reload)
   (:use [clojure.test]
         [esperanto.node :only [make-test-node node-fixture]]
-        [esperanto.admin.indices :only [refresh index-fixture]]
-        [esperanto.action :only [execute]]))
+        [esperanto.admin.indices :only [refresh index-fixture]]))
 
 (def node (make-test-node {}))
 

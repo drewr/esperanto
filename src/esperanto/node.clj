@@ -25,6 +25,13 @@
                "cluster.name" (rand-cluster-name)}
               settings)))
 
+(defn make-test-tcp-node [settings]
+  (make-node (merge
+              {"index.store.type" "ram"
+               "transport.host" "localhost"
+               "cluster.name" (rand-cluster-name)}
+              settings)))
+
 (defn node-fixture [node]
   (fn [f]
     (try
