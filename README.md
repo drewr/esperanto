@@ -4,7 +4,9 @@ Clojure library for ElasticSearch.
 
 ## Usage
 
-Visit `test/esperanto/test/search.clj` for now.
+The tests are the best documentation right
+now. `test/esperanto/test/search.clj` is a good start.  It
+demonstrates creating a node, indexing docs, and searching.
 
 ## License
 
