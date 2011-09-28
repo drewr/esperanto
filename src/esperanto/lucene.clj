@@ -4,8 +4,7 @@
            (org.apache.lucene.document Document Field
                                        Field$Store Field$Index)
            (org.apache.lucene.index IndexWriter IndexWriter$MaxFieldLength
-                                    Term)
-           (org.apache.lucene.util Version)))
+                                    Term)))
 
 (defn index [writer fields]
   (let [doc (Document.)]
@@ -20,4 +19,13 @@
       (if (.incrementToken st)
         (recur st (conj! v (.term term)))
         (persistent! v)))))
+
+(defn token-seq [analyzer rdr]
+  (let [stream (.tokenStream analyzer "field" rdr)
+        term (.addAttribute stream TermAttribute)
+        step (fn step [st v]
+               (lazy-seq
+                (when (.incrementToken st)
+                  (cons (.term term) (step st v)))))]
+    (step stream [])))
 
