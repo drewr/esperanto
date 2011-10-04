@@ -1,9 +1,7 @@
 (ns esperanto.test.lucene
   (:use [esperanto.lucene] :reload)
   (:use [clojure.test])
-  (:import (java.io File StringReader)
-           (org.apache.lucene.analysis.standard StandardAnalyzer)
-           (org.apache.lucene.util Version)))
+  (:import (java.io File StringReader)))
 
 (def ^:dynamic *dir* nil)
 
@@ -25,8 +23,4 @@
 (deftest t-analyze
   (let [tokens ["quick" "brown" "fox"
                 "jumps" "over" "lazy" "dog"]]
-    (is (= tokens (analyze
-                   (StandardAnalyzer. Version/LUCENE_31) text)))
-    (is (= tokens (token-seq
-                   (StandardAnalyzer. Version/LUCENE_31)
-                   (StringReader. text))))))
+    (is (= tokens (token-seq (StringReader. text))))))
