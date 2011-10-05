@@ -10,6 +10,6 @@ demonstrates creating a node, indexing docs, and searching.
 
 ## License
 
-Copyright (C) 2010-2011 Drew Raines
+Copyright (C) 2010-2011 Andrew A. Raines
 
 Distributed under the MIT license.
