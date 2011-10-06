@@ -12,6 +12,16 @@
 
 (def index "twitter")
 
+(def mapping {:tweet
+              {:tweet
+               {:_source {:enabled false}
+                :properties
+                {:text
+                 {:store "yes"
+                  :type "string"
+                  :index "not_analyzed"
+                  }}}}})
+
 (def doc {:type "tweet"
           :text "The quick brown fox jumps over the lazy dog"})
 
@@ -27,12 +37,12 @@
     (merge doc {:id (str i)})))
 
 (use-fixtures :once (node-fixture node))
-(use-fixtures :each (index-fixture node index))
+(use-fixtures :each (index-fixture node index mapping))
 
 (deftest t-index-single
   (index-doc client index doc)
   (refresh client index)
-  (is (= 1 (-> (searchq client index "quick") meta :total))))
+  (is (= 1 (-> (searchq client index "brown") meta :total))))
 
 (deftest t-index-double
   (index-doc client index doc)

@@ -25,13 +25,15 @@
       (.setQuery (QueryBuilders/queryString query))))
 
 (defn hit->clj [hit]
-  (with-meta (merge {:id (.getId hit)}
-                    (json/parse-string
-                     (.sourceAsString hit) :kw))
-    {:index (.getIndex hit)
-     :node (-> hit .getShard .getNodeId)
-     :shard (-> hit .getShard .getShardId)
-     :sort-vals (seq (.getSortValues hit))}))
+  (let [src (.sourceAsString hit)]
+    (with-meta (merge {:id (.getId hit)}
+                      (if src
+                        (json/parse-string src :kw)
+                        {:ERROR "_source is not enabled"}))
+      {:index (.getIndex hit)
+       :node (-> hit .getShard .getNodeId)
+       :shard (-> hit .getShard .getShardId)
+       :sort-vals (seq (.getSortValues hit))})))
 
 (defn search->clj [r]
   (with-meta (map hit->clj (.getHits r))
