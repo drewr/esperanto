@@ -41,6 +41,4 @@
    :else (statuses status)))
 
 (defn status [client & indices]
-  (-> (health client indices)
-      .getStatus
-      to-status))
+  (-> (health client indices) :status to-status))

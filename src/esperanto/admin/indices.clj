@@ -9,11 +9,11 @@
   ([client idx]
      (make-index-creation client idx {}))
   ([client idx settings]
-     (make-index-creation client idx {} {}))
+     (make-index-creation client idx settings {}))
   ([client idx settings mapping]
      (let [req (-> client .admin .indices
                    (.prepareCreate idx)
-                   (.setSettings settings))]
+                   (.setSettings (json/encode settings)))]
        (when mapping
          (doseq [[type obj] mapping]
            (.addMapping req (name type) (json/encode obj))))

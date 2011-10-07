@@ -4,7 +4,7 @@
         [esperanto.node :only [make-test-tcp-node node-fixture
                                rand-cluster-name]]
         [esperanto.admin.indices :only [refresh index-fixture create]]
-        [esperanto.admin.cluster :only [wait-for-green status]]
+        [esperanto.admin.cluster :only [wait-for-green wait-for-yellow status]]
         [esperanto.index :only [index-doc]]))
 
 (def cluster (rand-cluster-name))
@@ -21,16 +21,12 @@
                                        :host "localhost"
                                        :port port})]
     (try
-      (is (not (.isTimedOut masterwait)))
-      (is (not (.isTimedOut (wait-for-green client [] 5000))))
-      (is
-       (.getAcknowledged
-        (create client index
-                (cheshire.core/generate-string
-                 {:index.number_of_replicas "0"}))))
-      (is (not (.isTimedOut (wait-for-green client [index] 5000))))
+      (is (not (:timedOut masterwait)))
+      (is (not (:timedOut (wait-for-green client [] 5000))))
+      (is (:acknowledged (create client index {:number_of_replicas 0})))
+      (is (not (:timedOut (wait-for-green client [index] 3000))))
       (index-doc client index doc)
       (refresh client index)
-      (is (not (.isTimedOut (wait-for-green client [index] 5000))))
+      (is (not (:timedOut (wait-for-green client [index] 3000))))
       (finally
        (.stop master)))))

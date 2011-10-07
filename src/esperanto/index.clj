@@ -31,7 +31,7 @@
 
 (defn index-doc [client idx doc]
   (merge doc
-         {:id (.getId @(execute (make-index-request client idx doc)))}))
+         @(execute (make-index-request client idx doc))))
 
 (defn index-bulk
   ([client reqs]
@@ -50,9 +50,12 @@
        (filter #(.isFailed %))
        (map #(.getFailureMessage %))))
 
-(defn copy [client1 idx1 client2 idx2]
+(defn copy [client1 idx1 client2 idx2 & {:keys [batchsize]}]
   (count
    (apply concat
-          (for [docs (partition-all 5 (index-seq client1 idx1))]
-            (index-bulk client2 idx2 docs)))))
+          (remove :failed?
+                  (map :items (for [docs (partition-all
+                                          (or batchsize 50)
+                                          (index-seq client1 idx1))]
+                                (index-bulk client2 idx2 docs)))))))
 

@@ -55,9 +55,9 @@
         _ (refresh client index)
         sresp (searchq client index "quick")
         timeout 500]
-    (is (< (.getTookInMillis resp) timeout)
+    (is (< (:tookInMillis resp) timeout)
         (format "*** bulk index took longer than %dms" timeout))
-    (is (not (.hasFailures resp)))
+    (is (not (:failures? resp)))
     (is (= 100 (-> sresp meta :total)))))
 
 (deftest t-index-seq
@@ -68,7 +68,7 @@
         _ (refresh client index)
         sresp (search client index)
         xs (index-seq client index)]
-    (is (not (.hasFailures bulk)))
+    (is (not (:failures? bulk)))
     ;; How many docs does ES think the index has?
     (is (= ct (count client index)))
     ;; How many docs does a search for all docs return?
