@@ -16,7 +16,7 @@
                    (.setSettings (json/encode settings)))]
        (when mapping
          (doseq [[type obj] mapping]
-           (.addMapping req (name type) (json/encode obj))))
+           (.addMapping req (name type) (json/encode {type obj}))))
        req)))
 
 (defn make-refresh-request [client & indices]

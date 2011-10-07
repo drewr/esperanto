@@ -13,14 +13,13 @@
 (def index "twitter")
 
 (def mapping {:tweet
-              {:tweet
-               {:_source {:enabled false}
-                :properties
-                {:text
-                 {:store "yes"
-                  :type "string"
-                  :index "not_analyzed"
-                  }}}}})
+              {:_source {:enabled false}
+               :properties
+               {:text
+                {:store "yes"
+                 :type "string"
+                 :index "not_analyzed"
+                 }}}})
 
 (def doc {:type "tweet"
           :text "The quick brown fox jumps over the lazy dog"})
