@@ -1,5 +1,6 @@
 (ns esperanto.interactive
-  (:gen-class))
+  (:gen-class)
+  (:use [esperanto.client :only [make-transport-client]]))
 
 (def welcome "ElasticSearch Shell")
 
@@ -11,7 +12,8 @@
   (with-out-str
     (println "Type as much of a command as necessary.")
     (let [f "%-20s %-60s"
-          lines [["cluster NAME" "Change to cluster NAME."]
+          lines [["cluster NAME HOST:PORT"
+                  "Change to cluster NAME listening on HOST:PORT."]
                  ["exit" "Leave essh (or ^D)."]]]
       (doseq [line lines]
         (println (apply format f line))))))
