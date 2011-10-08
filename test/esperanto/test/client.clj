@@ -4,7 +4,7 @@
         [esperanto.node :only [make-test-tcp-node node-fixture
                                rand-cluster-name]]
         [esperanto.admin.indices :only [refresh index-fixture create]]
-        [esperanto.admin.cluster :only [wait-for-green wait-for-yellow status]]
+        [esperanto.admin.cluster :only [wait-for-green status]]
         [esperanto.index :only [index-doc]]))
 
 (def cluster (rand-cluster-name))
