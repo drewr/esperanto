@@ -22,7 +22,6 @@
   (let [shard-count 1]
     (create client index {"number_of_shards" shard-count
                           "number_of_replicas" "0"})
-    (esperanto.index/index-doc client index doc)
     (refresh client index)
     (is (= shard-count (count (shards client index))))
     (delete client index)))
