@@ -23,6 +23,59 @@
          Transformer
          {:transform ~f}))))
 
+(deftransform org.elasticsearch.common.unit.TimeValue
+  "===  public org.elasticsearch.common.unit.TimeValue  ===
+   [ 0] static parseTimeValue : TimeValue (String,TimeValue)
+   [ 1] static readTimeValue : TimeValue (StreamInput)
+   [ 2] static timeValueHours : TimeValue (long)
+   [ 3] static timeValueMillis : TimeValue (long)
+   [ 4] static timeValueMinutes : TimeValue (long)
+   [ 5] static timeValueSeconds : TimeValue (long)
+   [ 6] <init> (long)
+   [ 7] <init> (long,TimeUnit)
+   [ 8] days : long ()
+   [ 9] daysFrac : double ()
+   [10] equals : boolean (Object)
+   [11] format : String ()
+   [12] format : String (PeriodType)
+   [13] getClass : Class ()
+   [14] getDays : long ()
+   [15] getDaysFrac : double ()
+   [16] getHours : long ()
+   [17] getHoursFrac : double ()
+   [18] getMicros : long ()
+   [19] getMicrosFrac : double ()
+   [20] getMillis : long ()
+   [21] getMillisFrac : double ()
+   [22] getMinutes : long ()
+   [23] getMinutesFrac : double ()
+   [24] getNanos : long ()
+   [25] getSeconds : long ()
+   [26] getSecondsFrac : double ()
+   [27] hashCode : int ()
+   [28] hours : long ()
+   [29] hoursFrac : double ()
+   [30] micros : long ()
+   [31] microsFrac : double ()
+   [32] millis : long ()
+   [33] millisFrac : double ()
+   [34] minutes : long ()
+   [35] minutesFrac : double ()
+   [36] nanos : long ()
+   [37] notify : void ()
+   [38] notifyAll : void ()
+   [39] readFrom : void (StreamInput)
+   [40] seconds : long ()
+   [41] secondsFrac : double ()
+   [42] toString : String ()
+   [43] wait : void ()
+   [44] wait : void (long)
+   [45] wait : void (long,int)
+   [46] writeTo : void (StreamOutput)
+  "
+  [obj]
+  (bean obj))
+
 (deftransform org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse
   "===  public org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse  ===
    [ 0] <init> (String,List)
@@ -210,7 +263,61 @@
    [37] writeTo : void (StreamOutput)
   "
   [obj]
+  (merge
+   (bean obj)
+   {:docs (transform (.getDocs obj))
+    :refreshStats (transform (.getRefreshStats obj))}))
+
+(deftransform org.elasticsearch.action.admin.indices.status.DocsStatus
+  "===  public org.elasticsearch.action.admin.indices.status.DocsStatus  ===
+   [ 0] <init> ()
+   [ 1] deletedDocs : int ()
+   [ 2] equals : boolean (Object)
+   [ 3] getClass : Class ()
+   [ 4] getDeletedDocs : int ()
+   [ 5] getMaxDoc : int ()
+   [ 6] getNumDocs : int ()
+   [ 7] hashCode : int ()
+   [ 8] maxDoc : int ()
+   [ 9] notify : void ()
+   [10] notifyAll : void ()
+   [11] numDocs : int ()
+   [12] toString : String ()
+   [13] wait : void ()
+   [14] wait : void (long)
+   [15] wait : void (long,int)
+  "
+  [obj]
   (bean obj))
+
+(deftransform org.elasticsearch.index.refresh.RefreshStats
+  "===  public org.elasticsearch.index.refresh.RefreshStats  ===
+   [ 0] static EMPTY_PARAMS : Params
+   [ 1] static readRefreshStats : RefreshStats (StreamInput)
+   [ 2] <init> ()
+   [ 3] <init> (long,long)
+   [ 4] add : void (RefreshStats)
+   [ 5] add : void (long,long)
+   [ 6] equals : boolean (Object)
+   [ 7] getClass : Class ()
+   [ 8] hashCode : int ()
+   [ 9] notify : void ()
+   [10] notifyAll : void ()
+   [11] readFrom : void (StreamInput)
+   [12] toString : String ()
+   [13] toXContent : XContentBuilder (XContentBuilder,Params)
+   [14] total : long ()
+   [15] totalTime : TimeValue ()
+   [16] totalTimeInMillis : long ()
+   [17] wait : void ()
+   [18] wait : void (long)
+   [19] wait : void (long,int)
+   [20] writeTo : void (StreamOutput)
+  "
+  [obj]
+  {:secs (.total obj)
+   :time (transform (.totalTime obj))
+   :millis (.totalTimeInMillis obj)})
 
 (deftransform org.elasticsearch.action.bulk.BulkResponse
   "===  public org.elasticsearch.action.bulk.BulkResponse  ===
@@ -460,3 +567,4 @@
      :timed-out? (.isTimedOut obj)
      :took (.getTookInMillis obj)
      :total (-> obj .getHits .getTotalHits)}))
+

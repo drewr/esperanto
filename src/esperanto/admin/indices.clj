@@ -60,3 +60,6 @@
             mapping)
     (f)))
 
+(defn shards [client index]
+  (-> client (status index) :shards))
+
