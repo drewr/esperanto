@@ -1,7 +1,4 @@
 (ns esperanto.action
-  (:require [esperanto.transform.cluster]
-            [esperanto.transform.indices]
-            [esperanto.transform.index])
   (:use [esperanto.transform :only [transform]])
   (:import (org.elasticsearch.action ActionListener)
            (org.elasticsearch.indices IndexMissingException)))
