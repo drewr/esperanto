@@ -7,5 +7,6 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure.contrib/repl-utils "1.3.0-alpha4"]
                  [org.elasticsearch/elasticsearch "0.17.6"]
-                 [cheshire "2.0.2"]]
+                 [cheshire "2.0.2"]
+                 [slingshot "0.2.3"]]
   :aot [esperanto.interactive])

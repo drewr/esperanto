@@ -1,15 +1,21 @@
 (ns esperanto.index
   (:use [esperanto.action :only [execute]]
-        [esperanto.search :only [index-seq]])
+        [esperanto.search :only [index-seq]]
+        [slingshot.core])
   (:require [cheshire.core :as json]))
 
 (defn make-index-request
   ([client idx source]
-     (make-index-request client idx (or (get source :_type)
-                                        (get source "_type")
-                                        (get source :type)
-                                        (get source "type"))
-                         source))
+     (let [type (or (get source :_type)
+                    (get source "_type")
+                    (get source :type)
+                    (get source "type"))]
+       (if type
+         (make-index-request client idx type source)
+         (throw+ ::ENEEDTYPE
+                 (with-out-str
+                   (binding [*print-length* 3]
+                     (print "document needs to have a type:" source)))))))
   ([client idx type source]
      (let [req (-> client
                    (.prepareIndex idx type)

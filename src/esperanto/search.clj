@@ -35,12 +35,18 @@
   ([client idx]
      (search client idx {:match_all {}}))
   ([client idx query]
-     @(execute (make-search-request client idx query))))
+     @(execute (make-search-request client idx query)))
+  ([client idx query fields]
+     (let [req (make-search-request client idx query)]
+       (doseq [f fields]
+         (.addField req f))
+       @(execute req))))
 
 (defn searchq
   ([client idx query]
-     (search client idx {:query_string
-                         {:query query}})))
+     (searchq client idx query nil))
+  ([client idx query fields]
+     (search client idx {:query_string {:query query}} fields)))
 
 (defn count
   ([client idx]

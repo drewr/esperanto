@@ -13,13 +13,12 @@
 (def index "twitter")
 
 (def mapping {:tweet
-              {:_source {:enabled false}
+              {:_source {:enabled true}
                :properties
                {:text
                 {:store "yes"
                  :type "string"
-                 :index "not_analyzed"
-                 }}}})
+                 :index "analyzed"}}}})
 
 (def doc {:type "tweet"
           :text "The quick brown fox jumps over the lazy dog"})
@@ -99,3 +98,15 @@
   (is (= 1 (count client index "quick")))
   (is (= 0 (count client index "foo"))))
 
+(deftest t-fields
+  (index-doc client index doc)
+  (refresh client index)
+  (is (= {"text" "The quick brown fox jumps over the lazy dog"}
+         (-> (searchq client index "quick" ["text"]) first meta :fields)))
+  (is (= {"text" "The quick brown fox jumps over the lazy dog"}
+         (-> (searchq client index "quick" ["*"]) first meta :fields)))
+  (is (= {}
+         (-> (searchq client index "quick" ["NOEXIST"]) first meta :fields)))
+  (is (not (-> (searchq client index "quick" ["text"]) first meta :source)))
+  (is (not (-> (searchq client index "quick" ["*"]) first meta :source)))
+  (is (= :present (-> (searchq client index "quick") first meta :source))))

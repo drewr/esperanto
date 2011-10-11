@@ -476,15 +476,55 @@
    [56] writeTo : void (StreamOutput,StreamContext)
   "
   [hit]
-  (let [src (.sourceAsString hit)]
-    (with-meta (merge {:id (.getId hit)}
-                      (if src
-                        (json/parse-string src :kw)
-                        {:ERROR "_source is not enabled"}))
-      {:index (.getIndex hit)
-       :node (-> hit .getShard .getNodeId)
-       :shard (-> hit .getShard .getShardId)
-       :sort-vals (seq (.getSortValues hit))})))
+  (let [sas (.sourceAsString hit)
+        src (when sas (json/parse-string sas :kw))]
+    (with-meta (merge {:id (.getId hit)} src)
+      (merge
+       {
+        :fields (reduce (fn [acc [k v]] (merge acc (transform v)))
+                        {} (.getFields hit))
+        :filters (seq (.getMatchedFilters hit))
+        :hl-fields (.getHighlightFields hit)
+        :index (.getIndex hit)
+        :node (-> hit .getShard .getNodeId)
+        :score (.getScore hit)
+        :shard (-> hit .getShard .getShardId)
+        :sort-vals (seq (.getSortValues hit))
+        :source (when src :present)
+        :type (.getType hit)
+        }))))
+
+(deftransform org.elasticsearch.search.internal.InternalSearchHitField
+  "===  public org.elasticsearch.search.internal.InternalSearchHitField  ===
+   [ 0] static readSearchHitField : InternalSearchHitField (StreamInput)
+   [ 1] <init> (String,List)
+   [ 2] equals : boolean (Object)
+   [ 3] getClass : Class ()
+   [ 4] getName : String ()
+   [ 5] getValue : Object ()
+   [ 6] getValues : List ()
+   [ 7] hashCode : int ()
+   [ 8] iterator : Iterator ()
+   [ 9] name : String ()
+   [10] notify : void ()
+   [11] notifyAll : void ()
+   [12] readFrom : void (StreamInput)
+   [13] toString : String ()
+   [14] value : Object ()
+   [15] values : List ()
+   [16] wait : void ()
+   [17] wait : void (long)
+   [18] wait : void (long,int)
+   [19] writeTo : void (StreamOutput)
+  "
+  [obj]
+
+
+  {(.getName obj)
+   (let [vs (.getValues obj)]
+     (if (= 1 (count vs))
+       (first vs)
+       (seq vs)))})
 
 (deftransform org.elasticsearch.action.index.IndexResponse
   "===  public org.elasticsearch.action.index.IndexResponse  ===
