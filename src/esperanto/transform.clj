@@ -1,13 +1,19 @@
 (ns esperanto.transform
   "Traverse ElasticSearch world from this side."
-  (:require [cheshire.core :as json])
-  (:use [clojure.contrib.repl-utils :only [show]]))
+  (:require [clojure.reflect :as ref]
+            [cheshire.core :as json]))
 
 (defprotocol Transformer
   (transform [this] "More than meets the eye!"))
 
 (defn default [obj]
-  (show obj)
+  (doseq [x (sort (for [m (->> "foo" ref/reflect :members
+                               (filter #(instance? clojure.reflect.Method %)))]
+                    (format "%s : %s (%s)"
+                            (:name m)
+                            (:return-type m)
+                            (:parameter-types m))))]
+    (println x))
   obj)
 
 (extend Object Transformer {:transform default})
@@ -607,4 +613,3 @@
      :timed-out? (.isTimedOut obj)
      :took (.getTookInMillis obj)
      :total (-> obj .getHits .getTotalHits)}))
-
