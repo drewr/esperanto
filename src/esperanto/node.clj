@@ -22,6 +22,9 @@
   (make-node (merge
               {"index.store.type" "ram"
                "node.local" "true"
+               "transport.host" "localhost"
+               "http.bind_host" "localhost"
+               "http.publish_host" "localhost"
                "cluster.name" (rand-cluster-name)}
               settings)))
 
