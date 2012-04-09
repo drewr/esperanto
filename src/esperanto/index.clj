@@ -1,7 +1,7 @@
 (ns esperanto.index
   (:use [esperanto.action :only [execute]]
         [esperanto.search :only [index-seq]]
-        [slingshot.core])
+        [slingshot.slingshot])
   (:require [cheshire.core :as json]))
 
 (defn make-index-request
