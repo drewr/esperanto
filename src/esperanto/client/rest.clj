@@ -32,7 +32,7 @@
 
 (defn data:load [opts]
   (let [o (merge {:method :put
-                  :bulksize 3} opts)
+                  :bulksize 100} opts)
         metas (repeat (json/encode {:index
                                     {:_index (:index o)
                                      :_type (:type o)}}))
