@@ -19,6 +19,11 @@
                 opts
                 {:url (http/uri-append (:url opts) "_refresh")})))
 
+(defn index:search [opts]
+  (query (merge {:method :post}
+                opts
+                {:url (http/uri-append (:url opts) "_search")})))
+
 (defn index:bulk [opts]
   (query (merge {:method :post}
                 opts

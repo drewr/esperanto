@@ -59,3 +59,13 @@
 
 (deftest t-count
   (is (= 7 (-> {:url (url node index)} es/index:count :body :count))))
+
+(deftest t-facet-stat
+  (is (< 0.999999999999
+         (-> {:url (url node index)
+              :body {:query {:match_all {}}
+                     :facets {:foo
+                              {:statistical
+                               {:field :foo}}}}}
+             es/index:search :body :facets :foo :min)
+         1.000000000001)))
