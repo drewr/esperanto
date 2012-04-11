@@ -8,6 +8,9 @@
 (defn index:create [opts]
   (query (merge {:method :put} opts)))
 
+(defn index:delete [opts]
+  (query (merge {:method :delete} opts)))
+
 (defn index:count [opts]
   (query (merge {:method :get
                  :url (format "%s/_count?q=%s"
