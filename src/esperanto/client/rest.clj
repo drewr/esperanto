@@ -1,39 +1,36 @@
 (ns esperanto.client.rest
   (:require [cheshire.core :as json]
-            [esperanto.http :as http]))
+            [esperanto.http :as http]
+            [esperanto.utils :as u]))
 
-(defn query [opts]
-  (http/request opts))
+(defn query [url opts]
+  (http/request (merge {:url url} opts)))
 
-(defn index:create [opts]
-  (query (merge {:method :put} opts)))
+(defn index:create [url & {:as opts}]
+  (query url (merge {:method :put} opts)))
 
-(defn index:delete [opts]
-  (query (merge {:method :delete} opts)))
+(defn index:delete [url & {:as opts}]
+  (query url (merge {:method :delete} opts)))
 
-(defn index:count [opts]
-  (query (merge {:method :get
-                 :url (format "%s/_count?q=%s"
-                              (:url opts)
-                              (:query opts "*:*"))})))
+(defn index:count [url & {:as opts}]
+  (query (format "%s/_count?q=%s" url (:query opts "*:*"))
+         (merge {:method :get})))
 
-(defn index:refresh [opts]
-  (query (merge {:method :get}
-                opts
-                {:url (http/uri-append (:url opts) "_refresh")})))
+(defn index:refresh [url & {:as opts}]
+  (query (http/uri-append url "_refresh")
+         (merge {:method :get} opts {})))
 
-(defn index:search [opts]
-  (query (merge {:method :post}
-                opts
-                {:url (http/uri-append (:url opts) "_search")})))
+(defn index:search [url & {:as opts}]
+  (query (http/uri-append url "_search")
+         (merge {:method :post} opts)))
 
-(defn index:bulk [opts]
-  (query (merge {:method :post}
-                opts
-                {:url (http/uri-append (:url opts) "_bulk")
-                 :body (str (:body opts) "\n")})))
+(defn index:bulk [url & opts]
+  (let [o (u/args opts)]
+    (query (http/uri-append url "_bulk")
+           (merge {:method :post} o
+                  {:body (str (:body o) "\n")}))))
 
-(defn data:load [opts]
+(defn data:load [url & {:as opts}]
   (let [o (merge {:method :put
                   :bulksize 100} opts)
         metas (repeat (json/encode {:index
@@ -43,4 +40,4 @@
                      (for [batch (partition-all (:bulksize o) (:doc-seq o))]
                        (interleave (take (count batch) metas) batch)))]
     (doseq [b batches]
-      (index:bulk (assoc o :body b)))))
+      (index:bulk url (assoc o :body b)))))
