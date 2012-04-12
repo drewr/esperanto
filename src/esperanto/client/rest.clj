@@ -40,8 +40,7 @@
                                     {:_index (:index o)
                                      :_type (:type o)}}))
         batches (map #(apply str (interpose "\n" %))
-                     (for [batch (partition-all (:bulksize o)
-                                                (-> o :reader line-seq))]
+                     (for [batch (partition-all (:bulksize o) (:doc-seq o))]
                        (interleave (take (count batch) metas) batch)))]
     (doseq [b batches]
       (index:bulk (assoc o :body b)))))

@@ -3,19 +3,12 @@
         [esperanto.admin.indices :only [refresh index-fixture]]
         [esperanto.node :only [make-test-node node-fixture]])
   (:require [clojure.java.io :as io]
+            [cheshire.core :as json]
             [esperanto.client.rest :as es]))
 
 (def node (make-test-node {}))
 
 (def index "twitter")
-
-(def mapping {:tweet
-              {:_source {:enabled true}
-               :properties
-               {:text
-                {:store "yes"
-                 :type "string"
-                 :index "analyzed"}}}})
 
 (def doc {:type "tweet"
           :text "The quick brown fox jumps over the lazy dog"})
@@ -37,35 +30,32 @@
   ([n index]
      (format "%s/%s" (host n) index))
   ([n index type]
-     (format "%s/%s" (url (host n) index) type))
+     (format "%s/%s/%s" (host n) index type))
   ([n index type id]
-     (format "%s/%s" (url (host n) index type) id)))
+     (format "%s/%s/%s/%s" (host n) index type id)))
 
 (defn doc-seq [n]
   (for [i (range n)]
-    (merge doc {:id (str i)})))
+    (merge doc {:id (str i) :num i})))
 
 (use-fixtures :once
-              (node-fixture node)
-              (fn [t]
-                (es/data:load {:url (url node)
-                               :index index
-                               :type "tweet"
-                               :reader (-> "data/foo.txt"
-                                           io/resource
-                                           io/reader)})
-                (es/index:refresh {:url (url node index)})
-                (t)))
+  (node-fixture node))
 
-(deftest t-count
-  (is (= 7 (-> {:url (url node index)} es/index:count :body :count))))
-
-(deftest t-facet-stat
-  (is (< 0.999999999999
-         (-> {:url (url node index)
-              :body {:query {:match_all {}}
-                     :facets {:foo
-                              {:statistical
-                               {:field :foo}}}}}
-             es/index:search :body :facets :foo :min)
-         1.000000000001)))
+(deftest t-all
+  (let [_idx "idx"
+        _type "typ"
+        ct 11]
+    (es/data:load {:url (url node)
+                   :index _idx
+                   :type _type
+                   :doc-seq (map json/encode (doc-seq ct))})
+    (es/index:refresh {:url (url node _idx)})
+    (is (= ct (-> {:url (url node _idx)} es/index:count :body :count)))
+    (is (< 4.99999999
+           (-> {:url (url node _idx)
+                :body {:query {:match_all {}}
+                       :facets {:foo
+                                {:statistical
+                                 {:field :num}}}}}
+               es/index:search :body :facets :foo :mean)
+           5.00000001))))
