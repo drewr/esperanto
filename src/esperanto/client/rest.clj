@@ -40,12 +40,14 @@
                   (let [doc (json/decode doc)
                         ix (:index o (doc "_index"))
                         ty (:type o (doc "_type"))
-                        id (:id o (doc "_id"))]
+                        id (:id o (doc "_id"))
+                        m {:index {:_index ix :_type ty}}
+                        m (if id (update-in m [:index] assoc :_id id) m)]
                     (if (not (and ix ty))
                       (throw (Exception.
                               (str "missing _index or _type for doc "
                                    (with-out-str (pr doc))))))
-                    (json/encode {:index {:_index ix :_type ty :_id id}})))
+                    (json/encode m)))
         batches (map #(apply str (interpose "\n" %))
                      (for [batch (partition-all (:bulksize o) (:doc-seq o))]
                        (interleave (map metaize batch) (map demetaize batch))))]
