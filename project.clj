@@ -8,5 +8,5 @@
                  [org.elasticsearch/elasticsearch "0.19.2"]
                  [clj-http "0.3.6"]
                  [slingshot "0.10.2"]
-                 [cheshire "3.1.0"]]
+                 [cheshire "4.0.0"]]
   :aot [esperanto.interactive])
