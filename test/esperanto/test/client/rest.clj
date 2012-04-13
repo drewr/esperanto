@@ -42,30 +42,43 @@
   (node-fixture node))
 
 (deftest t-all
-  (let [_idx "idx"
-        _type "typ"
-        ct 11]
+    (let [_idx "idx"
+          _type "typ"
+          ct 11]
+      (es/data:load (url node)
+                    :index _idx
+                    :type _type
+                    :doc-seq (map json/encode (doc-seq ct)))
+      (es/index:refresh (url node _idx))
+      (is (= ct (-> (url node _idx) es/index:count :body :count)))
+      (is (< 4.99999999
+             (->> (es/index:search (url node _idx)
+                                   :body {:query {:match_all {}}
+                                          :facets {:foo
+                                                   {:statistical
+                                                    {:field :num}}}})
+                  :body :facets :foo :mean)
+             5.00000001))))
+
+(deftest t-override
+  (let [_idx "ffffffff"
+        _type "tttttt"
+        f "data/foo.txt"]
     (es/data:load (url node)
                   :index _idx
                   :type _type
-                  :doc-seq (map json/encode (doc-seq ct)))
+                  :doc-seq (-> f io/resource io/reader line-seq))
     (es/index:refresh (url node _idx))
-    (is (= ct (-> (url node _idx) es/index:count :body :count)))
-    (is (< 4.99999999
-           (->> (es/index:search (url node _idx)
-                                 :body {:query {:match_all {}}
-                                        :facets {:foo
-                                                 {:statistical
-                                                  {:field :num}}}})
-                :body :facets :foo :mean)
-           5.00000001))))
+    (is (= 7 (-> (es/index:search (url node _idx)
+                                  :body {:query {:match_all {}}})
+                 :body :hits :total)))
+    (is (= 7 (-> (url node _idx) es/index:count :body :count)))
 
-#_(deftest t-override
-    (let [_idx "ffffffff"
-          _type "tttttt"
-          f "data/foo.txt"]
-      (es/data:load (url node) {:index _idx
-                                :type _type
-                                :doc-seq (-> f io/resource io/reader line-seq)})
-      (es/index:refresh {:url (url node _idx)}))
-    )
+    (es/data:load (url node)
+                  :type _type
+                  :doc-seq (-> f io/resource io/reader line-seq))
+    (es/index:refresh (url node "test"))
+    (is (= 7 (-> (es/index:search (url node "test")
+                                  :body {:query {:match_all {}}})
+                 :body :hits :total)))
+    (is (= 7 (-> (url node _idx) es/index:count :body :count)))))

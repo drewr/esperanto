@@ -25,19 +25,29 @@
          (merge {:method :post} opts)))
 
 (defn index:bulk [url & opts]
-  (let [o (u/args opts)]
+  (let [o (u/args opts)
+        body (str (:body o) "\n")]
     (query (http/uri-append url "_bulk")
-           (merge {:method :post} o
-                  {:body (str (:body o) "\n")}))))
+           (merge {:method :post} o {:body body}))))
 
 (defn data:load [url & {:as opts}]
   (let [o (merge {:method :put
                   :bulksize 100} opts)
-        metas (repeat (json/encode {:index
-                                    {:_index (:index o)
-                                     :_type (:type o)}}))
+        demetaize (fn [doc]
+                    (let [doc (json/decode doc)]
+                      (json/encode (dissoc doc :_index :_type))))
+        metaize (fn [doc]
+                  (let [doc (json/decode doc)
+                        ix (:index o (doc "_index"))
+                        ty (:type o (doc "_type"))
+                        id (:id o (doc "_id"))]
+                    (if (not (and ix ty))
+                      (throw (Exception.
+                              (str "missing _index or _type for doc "
+                                   (with-out-str (pr doc))))))
+                    (json/encode {:index {:_index ix :_type ty :_id id}})))
         batches (map #(apply str (interpose "\n" %))
                      (for [batch (partition-all (:bulksize o) (:doc-seq o))]
-                       (interleave (take (count batch) metas) batch)))]
+                       (interleave (map metaize batch) (map demetaize batch))))]
     (doseq [b batches]
       (index:bulk url (assoc o :body b)))))
