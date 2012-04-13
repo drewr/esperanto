@@ -6,7 +6,7 @@
         [esperanto.node :only [make-test-node node-fixture]]
         [esperanto.admin.indices :only [refresh index-fixture]]))
 
-(def node (make-test-node {}))
+(def node (make-test-node {"node.name" (str *ns*)}))
 
 (def client (.client node))
 

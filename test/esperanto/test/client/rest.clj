@@ -6,7 +6,7 @@
             [cheshire.core :as json]
             [esperanto.client.rest :as es]))
 
-(def node (make-test-node {}))
+(def node (make-test-node {"node.name" (str *ns*)}))
 
 (def index "twitter")
 
