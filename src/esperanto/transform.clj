@@ -7,7 +7,7 @@
   (transform [this] "More than meets the eye!"))
 
 (defn default [obj]
-  (doseq [x (sort (for [m (->> "foo" ref/reflect :members
+  (doseq [x (sort (for [m (->> obj ref/reflect :members
                                (filter #(instance? clojure.reflect.Method %)))]
                     (format "%s : %s (%s)"
                             (:name m)
