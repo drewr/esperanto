@@ -9,4 +9,11 @@
                  [clj-http "0.5.1"]
                  [slingshot "0.10.2"]
                  [cheshire "4.0.1"]]
+  :jvm-opts ["-Xmx512m"
+             "-XX:MaxPermSize=256m"
+             "-XX:+UseParNewGC"
+             "-XX:+UseConcMarkSweepGC"
+             "-Dfile.encoding=UTF-8"
+             "-Dsun.jnu.encoding=UTF-8"
+             "-Dsun.io.useCanonCaches=false"]
   :aot [esperanto.interactive])
