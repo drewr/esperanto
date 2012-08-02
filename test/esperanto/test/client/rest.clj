@@ -48,7 +48,8 @@
       (es/data:load (url node)
                     :index _idx
                     :type _type
-                    :doc-seq (map json/encode (doc-seq ct)))
+                    :doc-seq (map json/encode (doc-seq ct))
+                    :bulknum 100)
       (es/index:refresh (url node _idx))
       (is (= ct (-> (url node _idx) es/index:count :body :count)))
       (is (< 4.99999999
@@ -67,7 +68,8 @@
     (es/data:load (url node)
                   :index _idx
                   :type _type
-                  :doc-seq (-> f io/resource io/reader line-seq))
+                  :doc-seq (-> f io/resource io/reader line-seq)
+                  :bulknum 2)
     (es/index:refresh (url node _idx))
     (is (= 7 (-> (es/index:search (url node _idx)
                                   :body {:query {:match_all {}}})
@@ -76,7 +78,8 @@
 
     (es/data:load (url node)
                   :type _type
-                  :doc-seq (-> f io/resource io/reader line-seq))
+                  :doc-seq (-> f io/resource io/reader line-seq)
+                  :bulknum 2)
     (es/index:refresh (url node "test"))
     (is (= 7 (-> (es/index:search (url node "test")
                                   :body {:query {:match_all {}}})

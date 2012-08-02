@@ -30,26 +30,29 @@
     (query (http/uri-append url "_bulk")
            (merge {:method :post} o {:body body}))))
 
-(defn data:load [url & {:as opts}]
-  (let [o (merge {:method :put
-                  :bulksize 100} opts)
-        demetaize (fn [doc]
-                    (let [doc (json/decode doc)]
-                      (json/encode (dissoc doc :_index :_type))))
-        metaize (fn [doc]
-                  (let [doc (json/decode doc)
-                        ix (:index o (doc "_index"))
-                        ty (:type o (doc "_type"))
-                        id (:id o (doc "_id"))
-                        m {:index {:_index ix :_type ty}}
-                        m (if id (update-in m [:index] assoc :_id id) m)]
-                    (if (not (and ix ty))
-                      (throw (Exception.
-                              (str "missing _index or _type for doc "
-                                   (with-out-str (pr doc))))))
-                    (json/encode m)))
-        batches (map #(apply str (interpose "\n" %))
-                     (for [batch (partition-all (:bulksize o) (:doc-seq o))]
-                       (interleave (map metaize batch) (map demetaize batch))))]
-    (doseq [b batches]
-      (index:bulk url (assoc o :body b)))))
+(defn metaize [o doc]
+  (let [doc (if (string? doc) (json/decode doc) doc)
+        ix (:index o (doc "_index"))
+        ty (:type o (doc "_type"))
+        id (:id o (doc "_id"))
+        m {:index {:_index ix :_type ty}}
+        m (if id (update-in m [:index] assoc :_id id) m)]
+    (if (not (and ix ty))
+      (throw (Exception.
+              (str "missing _index or _type for doc "
+                   (with-out-str (pr doc))))))
+    (json/encode m)))
+
+(defn data:load [url & {:as o}]
+  (count
+   (filter #(get-in % [:create :ok])
+           (apply concat
+                  (for [b (map #(apply str (interpose "\n" %))
+                               (for [batch (if (:bulkbytes o)
+                                             (u/partition-bytes (:bulkbytes o) (:doc-seq o))
+                                             (partition-all (:bulknum o) (:doc-seq o)))]
+                                 (do
+                                   (println (count batch))
+                                   (interleave (map (partial metaize o) batch)
+                                               batch))))]
+                    (->> (index:bulk url (assoc o :body b)) :body :items))))))
