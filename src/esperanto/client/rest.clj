@@ -1,7 +1,8 @@
 (ns esperanto.client.rest
   (:require [cheshire.core :as json]
             [esperanto.http :as http]
-            [esperanto.utils :as u]))
+            [esperanto.utils :as u])
+  (:import [java.util.concurrent Executors TimeUnit]))
 
 (defn query [url opts]
   (http/request (merge {:url url} opts)))
@@ -30,6 +31,18 @@
     (query (http/uri-append url "_bulk")
            (merge {:method :post} o {:body body}))))
 
+(defn responser [a resp]
+  (let [f (fn [acc item]
+            (let [op (-> item first key)]
+              (if (-> item :create :error)
+                (update-in acc [op :error] (fnil inc 0))
+                (update-in acc [op :ok] (fnil inc 0)))))]
+    (reduce f a (-> resp :body :items))))
+
+(defn submit-bulk [pool result url req]
+  (.execute pool (fn []
+                   (swap! result responser (index:bulk url req)))))
+
 (defn metaize [o doc]
   (let [doc (if (string? doc) (json/decode doc) doc)
         ix (:index o (doc "_index"))
@@ -44,15 +57,19 @@
     (json/encode m)))
 
 (defn data:load [url & {:as o}]
-  (count
-   (filter #(get-in % [:create :ok])
-           (apply concat
-                  (for [b (map #(apply str (interpose "\n" %))
-                               (for [batch (if (:bulkbytes o)
-                                             (u/partition-bytes (:bulkbytes o) (:doc-seq o))
-                                             (partition-all (:bulknum o) (:doc-seq o)))]
-                                 (do
-                                   (println (count batch))
-                                   (interleave (map (partial metaize o) batch)
-                                               batch))))]
-                    (->> (index:bulk url (assoc o :body b)) :body :items))))))
+  (let [pool (Executors/newFixedThreadPool (:threads o 1))
+        result (atom {})]
+    (doall
+     (apply concat
+            (for [b (map #(apply str (interpose "\n" %))
+                         (for [batch (if (:bulkbytes o)
+                                       (u/partition-bytes (:bulkbytes o)
+                                                          (:doc-seq o))
+                                       (partition-all (:bulknum o)
+                                                      (:doc-seq o)))]
+                           (interleave (map (partial metaize o) batch)
+                                       batch)))]
+              (submit-bulk pool result url (assoc o :body b)))))
+    (.shutdown pool)
+    (.awaitTermination pool 30 TimeUnit/SECONDS)
+    @result))
