@@ -15,11 +15,11 @@
 
 (defn index:count [url & {:as opts}]
   (query (format "%s/_count?q=%s" url (:query opts "*:*"))
-         (merge {:method :get})))
+         (merge {:method :get} opts)))
 
 (defn index:refresh [url & {:as opts}]
   (query (http/uri-append url "_refresh")
-         (merge {:method :get} opts {})))
+         (merge {:method :get} opts)))
 
 (defn index:search [url & {:as opts}]
   (query (http/uri-append url "_search")
