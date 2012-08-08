@@ -6,7 +6,8 @@
   (let [opts (if (map? (:body opts))
                (assoc opts :body (json/encode (:body opts)))
                opts)
-        resp (http/request (merge {:throw-entire-message? true}
+        resp (http/request (merge {:throw-entire-message? true
+                                   :throw-exceptions false}
                                   opts))
         body (if (string? (:body resp))
                (try
