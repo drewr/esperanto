@@ -1,11 +1,11 @@
-(defproject com.draines/esperanto "1.0.0-SNAPSHOT"
+(defproject com.draines/esperanto "0.9.0"
   :description "You know, for clojure"
   :repositories {"sonatype"
                  "http://oss.sonatype.org/content/repositories/releases/"
                  "java.net"
                  "http://download.java.net/maven/2/"}
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [org.elasticsearch/elasticsearch "0.19.2"]
+  :dependencies [[org.clojure/clojure "1.5.0-RC16"]
+                 [org.elasticsearch/elasticsearch "0.20.5"]
                  [clj-http "0.5.1"]
                  [slingshot "0.10.2"]
                  [cheshire "4.0.1"]]
