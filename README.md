@@ -2,6 +2,8 @@
 
 Clojure library for ElasticSearch.
 
+_No longer maintained.  Look to the official [Elasticsearch Clojure client](https://github.com/elastic/elasticsearch-clojure)._
+
 ## Usage
 
 The tests are the best documentation right
